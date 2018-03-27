@@ -14,6 +14,7 @@ messages.
 import pika
 import threading
 import logging
+import config as cfg
 
 from deiis.model import Serializer, JsonObject, Type
 
@@ -72,7 +73,7 @@ class MessageBus(object):
         bus = MessageBus()
         bus.publish('target', 'Hello world.')
     """
-    def __init__(self, exchange='message_bus', host='localhost'):
+    def __init__(self, exchange='message_bus', host=cfg.host):
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(host))
         self.channel = self.connection.channel()
         self.channel.exchange_declare(exchange=exchange, exchange_type='direct')
@@ -101,7 +102,7 @@ class BusListener(object):
         # Send a message to the above listener:
         bus.publish('my.address', 'Hello world.')
     """
-    def __init__(self, route, exchange='message_bus', host='localhost'):
+    def __init__(self, route, exchange='message_bus', host=cfg.host):
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(host))
         self.channel = self.connection.channel()
         self.channel.exchange_declare(exchange=exchange, exchange_type='direct')
@@ -136,7 +137,7 @@ class Broadcaster(object):
 
     Creates a 'fanout' exchange named 'broadcast'.
     """
-    def __init__(self, exchange='broadcast', host='localhost'):
+    def __init__(self, exchange='broadcast', host=cfg.host):
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(host))
         self.channel = self.connection.channel()
         self.channel.exchange_declare(exchange=exchange, exchange_type='fanout')
@@ -153,7 +154,7 @@ class BroadcastListener(object):
     """
     A listener for the 'broadcast' exchange.
     """
-    def __init__(self, exchange='broadcast', host='localhost'):
+    def __init__(self, exchange='broadcast', host=cfg.host):
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(host))
         self.channel = self.connection.channel()
         self.channel.exchange_declare(exchange=exchange, exchange_type='fanout')
@@ -196,7 +197,7 @@ class MessageQueue(object):
 
     Messages will be dealt out to listeners in a round-robin fashion.
     """
-    def __init__(self, name, host='localhost', exchange='', durable=False, fair=False):
+    def __init__(self, name, host=cfg.host, exchange='', durable=False, fair=False):
         self.exchange = exchange
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(host))
         self.channel = self.connection.channel()
