@@ -4,6 +4,7 @@ from logging import config
 from deiis.model import Question
 from BiRanker import BiRanker
 from SimilarityJaccard import SimilarityJaccard
+from Splitter import Splitter
 
 '''
 @Author: Khyathi Raghavi Chandu
@@ -32,18 +33,28 @@ class SoftMMR(BiRanker):
         length = 0
         # class method from abstract class that tokenizes all the snippets to sentences.
         similarity = SimilarityJaccard()
+        splitter = Splitter()
+        sentence_dict = dict()
+
         sentences = self.getSentences(question)
+        for sent in sentences:
+            tokens = splitter.tokenize_sentence(sent)
+            sentence_dict[sent] = tokens
+
+       
+        question_tokens = splitter.tokenize_sentence(question)
+
         for i in range(self.numSelectedSentences):
             best_sim = -99999999
             for sentence in sentences:
                 # similarityJaccard is an extension of Similarity Measure that takes 2 sentences ansd returns the float (similarity)
                 # similarityInstance = SimilarityJaccard(sentence, question['body'])
                 # ques_sim = similarityInstance.calculateSimilarity()
-                ques_sim = similarity.calculateSimilarity(sentence, question.body)
+                ques_sim = similarity.calculateSimilarity(set(sentence_dict[sentence]), set(question_tokens))
                 max_sent_sim = -99999999
                 for other in best:
                     # similarityInstance = SimilarityJaccard(sentence, other)
-                    sim = similarity.calculateSimilarity(sentence, other)
+                    sim = similarity.calculateSimilarity(set(sentence_dict[sentence]), set(splitter.tokenize_sentence(other)))
                     if self.beta != 0:  # since the value of beta is set to 0.5
                         try:
                             # current_sent_sim = (self.beta*similarityInstance.calculateSimilarity())+((1-self.beta)*pos_dict[sentence])

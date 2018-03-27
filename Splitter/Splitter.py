@@ -39,7 +39,7 @@ class Splitter(Task):
     def tokenize_sentence(self,s):
         sentence = Sentence(s)
         sentence.tokens = word_tokenize(s)
-        return sentence
+        return sentence.tokens
 
 
 

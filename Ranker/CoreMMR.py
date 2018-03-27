@@ -34,8 +34,8 @@ class CoreMMR(BiRanker):
 
         sentences = self.getSentences(question)
         for sent in sentences:
-            s = splitter.tokenize_sentence(sent)
-            sentence_dict[sent] = s.tokens
+            tokens = splitter.tokenize_sentence(sent)
+            sentence_dict[sent] = tokens
 
         question_tokens = splitter.tokenize_sentence(question)
         # class method from abstract class that tokenizes all the snippets to sentences.
@@ -49,7 +49,7 @@ class CoreMMR(BiRanker):
                 max_sent_sim = -99999999
                 for other in best:
                     # similarityInstance = SimilarityJaccard(sentence, other)
-                    sim = similarity.calculateSimilarity(sentence, other)
+                    sim = similarity.calculateSimilarity(set(sentence_dict[sentence]), set(splitter.tokenize_sentence(other)))
                     if self.beta != 0:
                         try:
                             # current_sent_sim = (self.beta*similarityInstance.calculateSimilarity())+((1-self.beta)*self.pos_dict[sentence])
